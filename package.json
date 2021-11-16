@@ -1,0 +1,17 @@
+{
+  "name": "rfideo",
+  "version": "1.0.0",
+  "author": "sy1vain <info@sylvain.nl>",
+  "dependencies": {},
+  "license": "MIT",
+  "main": "index.js",
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true,
+    "quoteProps": "consistent"
+  },
+  "private": true,
+  "type": "module"
+}
