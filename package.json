@@ -2,7 +2,10 @@
   "name": "rfideo",
   "version": "1.0.0",
   "author": "sy1vain <info@sylvain.nl>",
-  "dependencies": {},
+  "dependencies": {
+    "commander": "^8.3.0",
+    "detect-rpi": "^1.4.0"
+  },
   "license": "MIT",
   "main": "index.js",
   "prettier": {
