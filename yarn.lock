@@ -85,6 +85,11 @@ defaults@^1.0.3:
   dependencies:
     clone "^1.0.2"
 
+delay@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/delay/-/delay-5.0.0.tgz#137045ef1b96e5071060dd5be60bf9334436bd1d"
+  integrity sha512-ReEBKkIfe4ya47wlPYf/gu5ib6yUG0/Aez0JQZQz94kiWtRQvZIQbTiehsnwHvLSWJnQdhVeqYue7Id1dKr0qw==
+
 detect-rpi@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/detect-rpi/-/detect-rpi-1.4.0.tgz#f2fe3da65793d608d62f99b8404734721b7c77bb"
@@ -127,6 +132,11 @@ mimic-fn@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-2.1.0.tgz#7ed2c2ccccaf84d3ffcb7a69b57711fc2083401b"
   integrity sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==
+
+omxconductor@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/omxconductor/-/omxconductor-2.4.0.tgz#dd32f2c131938d039ea7d241b6d2406efdf3be6d"
+  integrity sha512-crA6nWL2dIo2+xHFPbCpYByN1rOHCSvu5qxqCDtnYvZy21XZyw7B+1DcsX3klJyWtnKw7wmANVcEwBtTSS7dMA==
 
 onetime@^5.1.0:
   version "5.1.2"
