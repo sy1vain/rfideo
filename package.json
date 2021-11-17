@@ -6,6 +6,8 @@
     "commander": "^8.3.0",
     "delay": "^5.0.0",
     "detect-rpi": "^1.4.0",
+    "enquirer": "^2.3.6",
+    "is-url": "^1.2.4",
     "omxconductor": "^2.4.0",
     "ora": "^6.0.1",
     "untildify": "^4.0.0"
