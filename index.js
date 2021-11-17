@@ -3,10 +3,11 @@
 import program from 'commander'
 import delay from 'delay'
 import isPi from 'detect-rpi'
-import { createFileFinder } from './lib/findFile.js'
-import { createPlayer } from './lib/player.js'
 import enquirer from 'enquirer'
 import isURL from 'is-url'
+import { createFileFinder } from './lib/findFile.js'
+import { createPlayer } from './lib/player.js'
+import { createReader } from './lib/rfid.js'
 const { Select, Input } = enquirer
 
 program.command('read').action(readCmd)
@@ -60,13 +61,14 @@ async function runCmd({ rfid, folder: folders }) {
 
   const idleVideo = await findFile('idle.mp4')
   const player = await createPlayer({ idleVideo })
+  const reader = rfid ? await createReader() : null
 
   while (true) {
     await delay(500)
 
     try {
       const prompt = new Input({ message: 'Filename' })
-      const fileName = await prompt.run()
+      const fileName = reader ? await reader.readString() : await prompt.run()
       if (!fileName) continue
       const fileOrUrl = isURL(fileName) ? fileName : await findFile(fileName)
 

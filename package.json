@@ -10,6 +10,7 @@
     "is-url": "^1.2.4",
     "omxconductor": "^2.4.0",
     "ora": "^6.0.1",
+    "rc522-rpi": "^2.1.5",
     "untildify": "^4.0.0"
   },
   "license": "MIT",
