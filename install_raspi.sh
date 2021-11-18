@@ -2,6 +2,12 @@
 
 cd "$(dirname "$0")"
 
+if ! [ -x "$(which omxplayer)" ]; then
+    echo "Installing omxplayer"
+    sudo apt update
+	sudo apt install -y omxplayer
+fi
+
 if ! [ -x "$(which node)" ]; then
     echo "Installing nodejs 16"
 	curl -sSL https://deb.nodesource.com/setup_16.x | sudo bash -
