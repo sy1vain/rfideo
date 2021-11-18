@@ -22,6 +22,7 @@ if ! [ -x "$(which yarn)" ]; then
 	sudo apt install -y yarn
 
     echo "Adding yarn to path"
+	echo >> ~/.bashrc
     echo 'export PATH=$PATH:"$(yarn global bin)"'  >> ~/.bashrc
 	. ~/.bashrc
 fi
@@ -35,11 +36,27 @@ if ! [ -x "$(which rfideo)" ]; then
 	yarn link > /dev/null
 fi
 
+add_startup () {
+	if grep -q '# RFIDEO' ~/.bashrc; then
+  		echo "Already added?"
+		return
+	fi
+	echo >> ~/.bashrc
+	echo "if ! ([ -n \"\$SSH_CLIENT\" ] || [ -n \"\$SSH_TTY\" ]); then $(which node) $(pwd); fi # RFIDEO" >> ~/.bashrc
+}
+
+remove_startup () {
+	sed -i 's/^.*# RFIDEO//' ~/.bashrc
+}
+
+# todo: check if not available
 while true; do
-	read -p "Add this script to bashrc as auto run? " yn
+	echo
+	echo
+	read -p "Add this script to ~/.bashrc as auto run? " yn
     case $yn in
-        [Yy]* ) echo "$(which node) $(pwd)" >> ~/.bashrc; break;;
-        [Nn]* ) break;;
+        [Yy]* ) add_startup; break;;
+        [Nn]* ) remove_startup; break;;
         * ) echo "Please answer yes or no.";;
     esac
 done
