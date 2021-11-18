@@ -22,8 +22,8 @@ if ! [ -x "$(which yarn)" ]; then
 	sudo apt install -y yarn
 
     echo "Adding yarn to path"
-    PATH="$PATH:$(yarn global bin)"  
-    echo "PATH="$PATH:$(yarn global bin)"" >> ~/.bashrc
+    echo 'export PATH=$PATH:"$(yarn global bin)"'  >> ~/.bashrc
+	source ~/.bashrc
 fi
 
 echo
