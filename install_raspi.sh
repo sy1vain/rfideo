@@ -23,7 +23,7 @@ if ! [ -x "$(which yarn)" ]; then
 
     echo "Adding yarn to path"
     echo 'export PATH=$PATH:"$(yarn global bin)"'  >> ~/.bashrc
-	source ~/.bashrc
+	. ~/.bashrc
 fi
 
 echo
