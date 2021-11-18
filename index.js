@@ -5,6 +5,7 @@ import delay from 'delay'
 import isPi from 'detect-rpi'
 import enquirer from 'enquirer'
 import isURL from 'is-url'
+import ora from 'ora'
 import { createFileFinder } from './lib/findFile.js'
 import { createPlayer } from './lib/player.js'
 import { createReader } from './lib/rfid.js'
@@ -52,11 +53,41 @@ async function choiceCommand({ ...opts }) {
   }
 }
 
-async function readCmd({ rfid }) {}
+async function readCmd({ rfid = isPi() }) {
+  if (!rfid) return
 
-async function writeCmd({ rfid }) {}
+  const spinner = ora('Waiting for card').start()
+  try {
+    const reader = await createReader()
+    const uid = await reader.findUID({ retries: 100 })
+    if (!uid) throw new Error('No card found')
+    const result = await reader.readString({ uid })
+    if (!result) throw new Error('Unable to read data...')
+    spinner.succeed(`Read: ${result}`)
+  } catch (e) {
+    spinner.fail(e.message || e)
+  }
+}
 
-async function runCmd({ rfid, folder: folders }) {
+async function writeCmd({ rfid = isPi() }) {
+  if (!rfid) return
+
+  const spinner = ora('Waiting for card')
+  try {
+    const data = await new Input('Data to write').run()
+    spinner.start()
+    const reader = await createReader()
+    const uid = await reader.findUID({ retries: 100 })
+    if (!uid) throw new Error('No card found')
+    const result = await reader.writeString({ uid, data })
+    if (!result) throw new Error('Unable to write data...')
+    spinner.succeed(`Written: ${data}`)
+  } catch (e) {
+    spinner.fail(e.message || e)
+  }
+}
+
+async function runCmd({ rfid = isPi(), folder: folders }) {
   const findFile = createFileFinder({ folders })
 
   const idleVideo = await findFile('idle.mp4')
@@ -67,8 +98,9 @@ async function runCmd({ rfid, folder: folders }) {
     await delay(500)
 
     try {
-      const prompt = new Input({ message: 'Filename' })
-      const fileName = reader ? await reader.readString() : await prompt.run()
+      const fileName = reader
+        ? await reader.readString()
+        : await new Input({ message: 'Filename' }).run()
       if (!fileName) continue
       const fileOrUrl = isURL(fileName) ? fileName : await findFile(fileName)
 
