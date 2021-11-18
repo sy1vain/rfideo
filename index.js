@@ -25,16 +25,17 @@ program.command('menu', { isDefault: true }).action(choiceCommand)
 program.parseAsync()
 
 async function choiceCommand({ ...opts }) {
-  let cancelTimeout = setTimeout(() => {
+  let autoRun = setTimeout(() => {
     prompt.cancel('auto choose run')
-  }, 5000)
+    runCmd({ ...opts })
+  }, 10000)
 
   const prompt = new Select({
     name: 'command',
     message: 'What do you want to do?',
     choices: ['run', 'read', 'write'],
     onSubmit: () => {
-      clearTimeout(cancelTimeout)
+      clearTimeout(autoRun)
     },
   })
 
@@ -49,7 +50,8 @@ async function choiceCommand({ ...opts }) {
         return writeCmd({ ...opts })
     }
   } catch (e) {
-    runCmd({ ...opts })
+  } finally {
+    clearTimeout(autoRun)
   }
 }
 

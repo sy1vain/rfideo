@@ -34,3 +34,12 @@ if ! [ -x "$(which rfideo)" ]; then
 	echo "Linking module"
 	yarn link > /dev/null
 fi
+
+while true; do
+	read -p "Add this script to bashrc as auto run? " yn
+    case $yn in
+        [Yy]* ) echo "$(which node) $(pwd)" >> ~/.bashrc; break;;
+        [Nn]* ) break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
