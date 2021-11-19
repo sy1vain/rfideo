@@ -99,10 +99,25 @@ async function runCmd({ rfid = isPi(), folder: folders }) {
   while (true) {
     await delay(500)
 
+    const tag = reader ? readStringCancelable({ reader }) : null
+    const prompt = new Input({
+      message: 'Filename',
+    })
+
     try {
-      const fileName = reader
-        ? await reader.readString()
-        : await new Input({ message: 'Filename' }).run()
+      //BUG this resolves immediatly?
+      const fileName = await Promise.race(
+        tag ? [prompt.run(), tag.promise] : [prompt.run()]
+      )
+
+      {
+        //clear prompt
+        prompt.value = fileName
+        await prompt.submit()
+
+        if (tag.cancel) await tag.cancel()
+      }
+
       if (!fileName) continue
       const fileOrUrl = isURL(fileName) ? fileName : await findFile(fileName)
 
@@ -111,10 +126,34 @@ async function runCmd({ rfid = isPi(), folder: folders }) {
       await player.play(fileOrUrl)
     } catch (e) {
       console.warn(e.message || e)
+      if (tag && tag.cancel) await tag.cancel()
       break
     }
     await delay(5000)
   }
 
   await player.stop()
+}
+
+function readStringCancelable({ reader }) {
+  let i = 0
+  const state = { running: true }
+  const promise = new Promise(async (resolve, reject) => {
+    try {
+      while (state.running) {
+        const result = await reader.readString({ retries: 1 })
+        if (result) return resolve(result)
+      }
+      resolve(null)
+    } catch (e) {
+      reject(e)
+    }
+  })
+
+  const cancel = () => {
+    state.running = false
+    return promise
+  }
+
+  return { promise, cancel }
 }
