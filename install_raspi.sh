@@ -27,6 +27,23 @@ if ! [ -x "$(which yarn)" ]; then
 	. ~/.bashrc
 fi
 
+prepare_boot_config () {
+	if ! grep -Pq '^dtparam=spi=on$' /boot/config.txt; then
+		echo 'Turning on SPI'
+		echo 'dtparam=spi=on' | sudo tee -a /boot/config.txt > /dev/null
+	fi
+	if ! grep -Pq '^disable_splash=1$' /boot/config.txt; then
+		echo 'Disable splash screen'
+		echo 'disable_splash=1' | sudo tee -a /boot/config.txt > /dev/null
+	fi
+	if ! grep -Pq '^gpu_mem=\d+$' /boot/config.txt; then
+		echo 'Setting gpu memory'
+		echo 'gpu_mem=128' | sudo tee -a /boot/config.txt > /dev/null
+	fi
+}
+
+prepare_boot_config;
+
 echo
 echo "Installing node_modules"
 yarn
@@ -60,3 +77,5 @@ while true; do
         * ) echo "Please answer yes or no.";;
     esac
 done
+
+echo '** PLEASE REBOOT NOW **'
