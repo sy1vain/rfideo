@@ -60,6 +60,12 @@ add_startup () {
 	fi
 	echo >> ~/.bashrc
 	echo "if ! ([ -n \"\$SSH_CLIENT\" ] || [ -n \"\$SSH_TTY\" ]); then $(which node) $(pwd); fi # RFIDEO" >> ~/.bashrc
+
+	if ! systemctl get-default | grep -q multi-user ; then
+		echo "Force boot to CLI"
+		sudo systemctl set-default multi-user.target
+		sudo ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+	fi
 }
 
 remove_startup () {
@@ -70,7 +76,7 @@ remove_startup () {
 while true; do
 	echo
 	echo
-	read -p "Add this script to ~/.bashrc as auto run? " yn
+	read -p "Do you want to run RFIDEO automatically (see README) " yn
     case $yn in
         [Yy]* ) add_startup; break;;
         [Nn]* ) remove_startup; break;;
