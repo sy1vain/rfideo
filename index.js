@@ -39,6 +39,10 @@ async function choiceCommand({ ...opts }) {
     },
   })
 
+  prompt.on('keypress', () => {
+    clearTimeout(autoRun)
+  })
+
   try {
     // const cmd = await prompt.run()
     switch (await prompt.run()) {
