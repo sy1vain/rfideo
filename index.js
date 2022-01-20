@@ -20,11 +20,15 @@ program
   .option('-f, --folder <value>', 'folder search paths', (value, previous) => {
     return (previous || []).concat([value])
   })
+  .option('-k, --fatal')
   .action(runCmd)
-program.command('menu', { isDefault: true }).action(choiceCommand)
+program
+  .command('menu', { isDefault: true })
+  .allowUnknownOption()
+  .action(choiceCommand)
 program.parseAsync()
 
-async function choiceCommand({ ...opts }) {
+async function choiceCommand({ ...opts }, { args }) {
   let autoRun = setTimeout(() => {
     prompt.cancel('auto choose run')
     runCmd({ ...opts })
@@ -44,15 +48,8 @@ async function choiceCommand({ ...opts }) {
   })
 
   try {
-    // const cmd = await prompt.run()
-    switch (await prompt.run()) {
-      case 'run':
-        return runCmd({ ...opts })
-      case 'read':
-        return readCmd({ ...opts })
-      case 'write':
-        return writeCmd({ ...opts })
-    }
+    const cmd = await prompt.run()
+    return program.parseAsync([cmd, ...args], { from: 'user' })
   } catch (e) {
   } finally {
     clearTimeout(autoRun)
@@ -93,7 +90,7 @@ async function writeCmd({ rfid = isPi() }) {
   }
 }
 
-async function runCmd({ rfid = isPi(), folder: folders }) {
+async function runCmd({ rfid = isPi(), folder: folders, fatal = false }) {
   const findFile = createFileFinder({ folders })
 
   const idleVideo = await findFile('idle.mp4')
@@ -119,7 +116,7 @@ async function runCmd({ rfid = isPi(), folder: folders }) {
         prompt.value = fileName
         await prompt.submit()
 
-        if (tag.cancel) await tag.cancel()
+        if (tag && tag.cancel) await tag.cancel()
       }
 
       if (!fileName) continue
@@ -132,6 +129,7 @@ async function runCmd({ rfid = isPi(), folder: folders }) {
       if (!e) break //we requested this
       logError(e)
       if (tag && tag.cancel) await tag.cancel()
+      if (fatal) break
     }
     await delay(500)
   }
