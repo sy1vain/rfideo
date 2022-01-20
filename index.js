@@ -20,7 +20,9 @@ program
   .option('-f, --folder <value>', 'folder search paths', (value, previous) => {
     return (previous || []).concat([value])
   })
-  .option('-k, --fatal')
+  .option('-k, --fatal', 'All errors will kill process')
+  .option('-s, --silent', 'No console output')
+  .option('--no-silent')
   .action(runCmd)
 program
   .command('menu', { isDefault: true })
@@ -90,7 +92,12 @@ async function writeCmd({ rfid = isPi() }) {
   }
 }
 
-async function runCmd({ rfid = isPi(), folder: folders, fatal = false }) {
+async function runCmd({
+  rfid = isPi(),
+  folder: folders,
+  fatal = false,
+  silent = false,
+}) {
   const findFile = createFileFinder({ folders })
 
   const idleVideo = await findFile('idle.mp4')
@@ -107,6 +114,7 @@ async function runCmd({ rfid = isPi(), folder: folders, fatal = false }) {
 
     try {
       //BUG this resolves immediatly?
+      if (silent) clearConsole()
       const fileName = await Promise.race(
         tag ? [prompt.run(), tag.promise] : [prompt.run()]
       )
@@ -127,11 +135,12 @@ async function runCmd({ rfid = isPi(), folder: folders, fatal = false }) {
       await player.play(fileOrUrl)
     } catch (e) {
       if (!e) break //we requested this
-      logError(e)
+      logError(e, silent)
       if (tag && tag.cancel) await tag.cancel()
       if (fatal) break
     }
     await delay(500)
+    if (silent) clearConsole()
   }
 
   await player.stop()
@@ -161,10 +170,16 @@ function readStringCancelable({ reader }) {
   return { promise, cancel }
 }
 
-function logError(e) {
+function logError(e, autoClear) {
   const message = e.message
     ? e.message.substring(0, e.message.indexOf(': {')) || e.message
     : e
 
   console.warn('Error:', message)
+
+  if (autoClear) setTimeout(clearConsole, 2000)
+}
+
+function clearConsole() {
+  setTimeout(console.clear)
 }
