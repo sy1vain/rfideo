@@ -129,14 +129,15 @@ async function runCmd({ rfid = isPi(), folder: folders }) {
 
       await player.play(fileOrUrl)
     } catch (e) {
-      console.warn(e.message || e)
+      if (!e) break //we requested this
+      logError(e)
       if (tag && tag.cancel) await tag.cancel()
-      break
     }
-    await delay(5000)
+    await delay(500)
   }
 
   await player.stop()
+  process.exit(0)
 }
 
 function readStringCancelable({ reader }) {
@@ -160,4 +161,12 @@ function readStringCancelable({ reader }) {
   }
 
   return { promise, cancel }
+}
+
+function logError(e) {
+  const message = e.message
+    ? e.message.substring(0, e.message.indexOf(': {')) || e.message
+    : e
+
+  console.warn('Error:', message)
 }
