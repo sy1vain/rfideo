@@ -6,6 +6,7 @@ import isPi from 'detect-rpi'
 import enquirer from 'enquirer'
 import isURL from 'is-url'
 import ora from 'ora'
+import { clearConsole, logError } from './lib/console.js'
 import { createFileFinder } from './lib/findFile.js'
 import { createPlayer } from './lib/player.js'
 import { createReader } from './lib/rfid.js'
@@ -23,6 +24,7 @@ program
   .option('-k, --fatal', 'All errors will kill process')
   .option('-s, --silent', 'No console output')
   .option('--no-silent')
+  .option('-o, --omx <options>', 'OMX flags')
   .action(runCmd)
 program
   .command('menu', { isDefault: true })
@@ -97,11 +99,12 @@ async function runCmd({
   folder: folders,
   fatal = false,
   silent = false,
+  omx: omxFlags,
 }) {
   const findFile = createFileFinder({ folders })
 
   const idleVideo = await findFile('idle.mp4')
-  const player = await createPlayer({ idleVideo })
+  const player = await createPlayer({ idleVideo, omxFlags })
   const reader = rfid ? await createReader() : null
 
   while (true) {
@@ -168,18 +171,4 @@ function readStringCancelable({ reader }) {
   }
 
   return { promise, cancel }
-}
-
-function logError(e, autoClear) {
-  const message = e.message
-    ? e.message.substring(0, e.message.indexOf(': {')) || e.message
-    : e
-
-  console.warn('Error:', message)
-
-  if (autoClear) setTimeout(clearConsole, 2000)
-}
-
-function clearConsole() {
-  setTimeout(console.clear)
 }
